@@ -1,4 +1,4 @@
-package com.example.lock;
+package com.example.lock.pessimistic;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

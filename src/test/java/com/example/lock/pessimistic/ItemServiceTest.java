@@ -1,4 +1,4 @@
-package com.example.lock;
+package com.example.lock.pessimistic;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ public class ItemServiceTest {
     private ItemRepository itemRepository;
 
     @Test
-    public void pessimisticLockWithConcurrency() throws InterruptedException {
+    public void verifyPessimisticLockWithConcurrency() throws InterruptedException {
         //  초기 데이터 설정
         logger.info("초기 아이템 데이터를 설정합니다.");
         Item item = new Item();

@@ -1,4 +1,4 @@
-package com.example.lock;
+package com.example.lock.pessimistic;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
