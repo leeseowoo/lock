@@ -1,5 +1,6 @@
 package com.example.lock.optimistic;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,8 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Test
-    public void verifyOptimisticLockWithConcurrency() throws InterruptedException {
+    @DisplayName("버전 충돌이 발생하여 한 스레드는 실패하고 예외가 발생한다.")
+    public void verifyOptimisticLockWithConcurrencyV1() throws InterruptedException {
         // 초기 데이터 설정
         Product product = new Product();
         product.setName("Product 1");
@@ -30,7 +32,7 @@ public class ProductServiceTest {
 
         Thread thread1 = new Thread(() -> {
             try {
-                productService.updateProductPrice(product.getId(), 200.0);
+                productService.updateProductPriceV1(product.getId(), 200.0);
             } catch (Exception e) {
                 exceptionHolder.set(e);
             }
@@ -38,7 +40,7 @@ public class ProductServiceTest {
 
         Thread thread2 = new Thread(() -> {
             try {
-                productService.updateProductPrice(product.getId(), 300.0);
+                productService.updateProductPriceV1(product.getId(), 300.0);
             } catch (Exception e) {
                 exceptionHolder.set(e);
             }
@@ -54,6 +56,44 @@ public class ProductServiceTest {
 
         // 예외 발생 검증
         assertInstanceOf(ObjectOptimisticLockingFailureException.class, exceptionHolder.get(), "ObjectOptimisticLockingFailureException이 발생해야 합니다.");
+    }
+
+    @Test
+    @DisplayName("버전 충돌이 발생하여 재시도 후 재시도 횟수 초과로 실패 처리를 위한 Recover 메서드가 호출된다.")
+    public void verifyOptimisticLockWithConcurrencyV2() throws InterruptedException {
+        // 초기 데이터 설정
+        Product product = new Product();
+        product.setName("Product 1");
+        product.setPrice(100.0);
+        productRepository.save(product);
+
+        AtomicReference<Exception> exceptionHolder = new AtomicReference<>();
+
+        Thread thread1 = new Thread(() -> {
+            try {
+                productService.updateProductPriceV2(product.getId(), 200.0);
+            } catch (Exception e) {
+                exceptionHolder.set(e);
+            }
+        });
+
+        Thread thread2 = new Thread(() -> {
+            try {
+                productService.updateProductPriceV2(product.getId(), 300.0);
+            } catch (Exception e) {
+                exceptionHolder.set(e);
+            }
+        });
+
+        // 두 스레드를 동시에 실행
+        thread1.start();
+        thread2.start();
+
+        // 두 스레드가 종료될 때까지 대기
+        thread1.join();
+        thread2.join();
+
+        // log 확인
     }
 }
 
