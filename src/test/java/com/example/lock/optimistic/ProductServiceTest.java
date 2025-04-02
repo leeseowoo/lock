@@ -46,13 +46,11 @@ public class ProductServiceTest {
             }
         });
 
-        // 두 스레드를 동시에 실행
-        thread1.start();
-        thread2.start();
+        thread1.start();    // 스레드 1 실행
+        thread2.start();    // 스레드 2 실행
 
-        // 두 스레드가 종료될 때까지 대기
-        thread1.join();
-        thread2.join();
+        thread1.join();     // 스레드 1 종료 대기
+        thread2.join();     // 스레드 2 종료 대기
 
         // 예외 발생 검증
         assertInstanceOf(ObjectOptimisticLockingFailureException.class, exceptionHolder.get(), "ObjectOptimisticLockingFailureException이 발생해야 합니다.");
@@ -85,13 +83,11 @@ public class ProductServiceTest {
             }
         });
 
-        // 두 스레드를 동시에 실행
-        thread1.start();
-        thread2.start();
+        thread1.start();    // 스레드 1 실행
+        thread2.start();    // 스레드 2 실행
 
-        // 두 스레드가 종료될 때까지 대기
-        thread1.join();
-        thread2.join();
+        thread1.join();     // 스레드 1 종료 대기
+        thread2.join();     // 스레드 2 종료 대기
 
         // log 확인
     }
